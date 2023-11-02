@@ -1,0 +1,32 @@
+{
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "telegraf": "^4.13.1",
+    "telegraf-session-local": "^2.1.1",
+    "tiktok-scraper-ts": "^1.4.1",
+    "tslog": "^4.8.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.8.10",
+    "@types/selenium-webdriver": "^4.1.19",
+    "nodemon": "^2.0.22",
+    "prisma": "^4.14.1"
+  },
+  "scripts": {
+    "start": "nodemon index.ts"
+  },
+  "compilerOptions": {
+    "typeRoots": [
+      "src/@types",
+      "node_modules/@types"
+    ],
+    "outDir": "dist"
+  },
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "node_modules"
+  ],
+  "extends": "@tsconfig/node18/tsconfig.json"
+}
