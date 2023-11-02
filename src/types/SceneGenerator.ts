@@ -7,7 +7,7 @@ export default class SceneGenerator {
   firstDate () {
     const firstDate = new Scenes.BaseScene<Scenes.SceneContext>('firstdate')
     firstDate.enter(async (ctx) => {
-      await ctx.reply('*Введите дату начала в формате ДД-ММ-ГГГГ*', { parse_mode: 'Markdown' })
+      await ctx.reply('*Введите дату начала в формате ММ.ДД.ГГГГ*', { parse_mode: 'Markdown' })
     })
     firstDate.on('text', async (ctx) => {
       const firstDateMessage = ctx.message.text
@@ -24,7 +24,7 @@ export default class SceneGenerator {
   secondDate () {
     const secondDate = new Scenes.BaseScene<Scenes.SceneContext>('seconddate')
     secondDate.enter(async (ctx) => {
-      await ctx.reply('*Введите дату конца в формате ДД-ММ-ГГГГ*', { parse_mode: 'Markdown' })
+      await ctx.reply('*Введите дату конца в формате ММ.ДД.ГГГГ*', { parse_mode: 'Markdown' })
     })
     secondDate.on('text', async (ctx) => {
       const secondDateMessage = ctx.message.text
@@ -48,7 +48,8 @@ export default class SceneGenerator {
       this.dataArray.push(name);
       const waitMessage = await ctx.reply('*Идет сбор информации...*', { parse_mode: 'Markdown' })
       await ctx.telegram.editMessageText(ctx.message?.chat.id, waitMessage.message_id, '', `${await getTikTokInfo(this.dataArray[0], this.dataArray[1], this.dataArray[2])}`, { parse_mode: 'Markdown' });
-      ctx.scene.leave()
+      ctx.scene.leave(); // Завершаем сцену
+      // Если пользователь отправит сообщение, отменяем таймаут
       this.dataArray.length = 0;
     })
     return getName
