@@ -2,6 +2,8 @@
 
 Set the token in the .env file to the variable TG_TOKEN=""
 
-npm install
+### Installing all packages
+```npm install```
 
-npm start
+### Launch a bot
+```npm start```
