@@ -33,7 +33,7 @@ export default async function getTikTokInfo(firstDate: string, secondDate: strin
     if (filteredArray.length == 0) { return '*За указаный период ничего не найдено*' }
     const filterPlayCount = filteredArray.reduce((accumulator, obj) => accumulator + obj.playCount, 0);
 
-    return `${filteredArray[0].directVideoUrl || ''} | ${filteredArray[0].createdAt || ''} | ${filteredArray[0].playCount || ''}\n${filteredArray[filteredArray.length - 1].directVideoUrl || ''} | ${filteredArray[filteredArray.length -1].createdAt || ''} | ${filteredArray[filteredArray.length -1].playCount || ''}\nВидео за этот период: ${filteredArray.length || ''}\nПросмотров за этот период: ${filterPlayCount || ''}`
+    return `*${filteredArray[0].directVideoUrl || ''} | ${filteredArray[0].createdAt || ''} | ${filteredArray[0].playCount || ''}\n${filteredArray[filteredArray.length - 1].directVideoUrl || ''} | ${filteredArray[filteredArray.length -1].createdAt || ''} | ${filteredArray[filteredArray.length -1].playCount || ''}\nВидео за этот период: ${filteredArray.length || ''}\nПросмотров за этот период: ${filterPlayCount || ''}*`
   } catch (error) {
     if (error instanceof TypeError && error.message.includes("Cannot read properties of undefined (reading 'users')")) {
       console.log(error)
