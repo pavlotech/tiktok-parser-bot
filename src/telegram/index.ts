@@ -4,7 +4,6 @@ import { bot } from '../../index';
 import help from './commands/help';
 import start from './commands/start';
 
-const lastUsageTimes: { [key: number]: number } = {};
 export async function loadTelegram() {
   try {
     bot.start(start);

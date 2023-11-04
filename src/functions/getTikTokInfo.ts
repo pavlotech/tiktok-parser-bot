@@ -1,4 +1,4 @@
-import { TTScraper } from "tiktok-scraper-ts";
+import { TTScraper } from "../tiktok/src/main";
 
 export default async function getTikTokInfo(firstDate: string, secondDate: string, nameOrUrl: string) {
   try {
@@ -8,6 +8,7 @@ export default async function getTikTokInfo(firstDate: string, secondDate: strin
     let username = match ? match[1] : nameOrUrl;
 
     const getAllVideosFromUser = await TikTokScraper.getAllVideosFromUser(String(username));
+    //console.log(getAllVideosFromUser);
     const combinedArray = getAllVideosFromUser.map(obj => {
       return {
         createdAt: obj.createdAt || '',
@@ -15,6 +16,7 @@ export default async function getTikTokInfo(firstDate: string, secondDate: strin
         playCount: obj.playCount || 0
       };
     });
+    //console.table(combinedArray);
     const startDate = new Date(firstDate);
     const endDate = new Date(secondDate);
 
@@ -36,12 +38,9 @@ export default async function getTikTokInfo(firstDate: string, secondDate: strin
     if (error instanceof TypeError && error.message.includes("Cannot read properties of undefined (reading 'users')")) {
       console.log(error)
       return '*Пользователь не найден!*';
-    } else if (error instanceof TypeError && error.message.includes("c is not iterable")) {
-      console.log(error)
-      return '*Аккаунт пользователя вызывает ошибку! попробуйте еще раз позже*';
-    } else if (error instanceof TypeError && error.message.includes("Cannot read properties of undefined (reading 'trim')")) {
-      console.log(error)
-      return '*Аккаунт пользователя вызывает ошибку! попробуйте еще раз позже*';
+    } else if (error instanceof Error && error.message.includes("Invalid response body")) {
+      console.log(error);
+      return '*TikTok выдал временную блокировку попробуйте немного позже!*';
     } else {
       console.log(error)
       return '*Произошла ошибка. Попробуйте позже!*';
