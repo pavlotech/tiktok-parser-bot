@@ -2,12 +2,12 @@
 
 ## Set the token in the .env file to the variable TG_TOKEN=""
 
-## Installing all packages
+### Installing all packages
 ```
 npm install
 ```
 
-## Launch a bot
+### Launch a bot
 ```
 npm start
 ```
