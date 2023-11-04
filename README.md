@@ -10,7 +10,7 @@
 
 • Install all packages
 ```
-npm install
+npm i
 ```
 
 • Launch a bot
