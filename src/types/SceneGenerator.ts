@@ -46,7 +46,7 @@ export default class SceneGenerator {
     getName.on('text', async (ctx) => {
       const name = ctx.message.text;
       this.dataArray.push(name);
-      const waitMessage = await ctx.reply('*Идет сбор информации...*', { parse_mode: 'Markdown' })
+      const waitMessage = await ctx.reply('*Идет получение информации...*', { parse_mode: 'Markdown' })
       await ctx.telegram.editMessageText(ctx.message?.chat.id, waitMessage.message_id, '', `${await getTikTokInfo(this.dataArray[0], this.dataArray[1], this.dataArray[2])}`, { parse_mode: 'Markdown' });
       ctx.scene.leave(); // Завершаем сцену
       // Если пользователь отправит сообщение, отменяем таймаут
