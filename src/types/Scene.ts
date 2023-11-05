@@ -2,7 +2,7 @@ import { Context, Scenes } from 'telegraf';
 import isValidDate from '../functions/isValidDate';
 import getTikTokInfo from '../functions/getTikTokInfo';
 
-export default class SceneGenerator {
+export default class Scene {
   dataArray: string[] = [];
   firstDate () {
     const firstDate = new Scenes.BaseScene<Scenes.SceneContext>('firstdate')
