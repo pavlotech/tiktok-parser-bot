@@ -7,6 +7,9 @@ export default async function getTikTokInfo(firstDate: string, secondDate: strin
     const match = nameOrUrl.match(/@(.+?)(\?|\/|$)/);
     let username = match ? match[1] : nameOrUrl;
 
+    const fetchUser = await TikTokScraper.user(username);
+    console.log(fetchUser);
+
     const getAllVideosFromUser = await TikTokScraper.getAllVideosFromUser(String(username));
     //console.log(getAllVideosFromUser);
     const combinedArray = getAllVideosFromUser.map(obj => {
