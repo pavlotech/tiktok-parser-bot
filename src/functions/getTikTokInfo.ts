@@ -8,45 +8,41 @@ export default async function getTikTokInfo(firstDate: string, secondDate: strin
     let username = match ? match[1] : nameOrUrl;
 
     const fetchUser = await TikTokScraper.user(username);
-    console.log(fetchUser);
 
-    const getAllVideosFromUser = await TikTokScraper.getAllVideosFromUser(String(username));
-    //console.log(getAllVideosFromUser);
-    const combinedArray = getAllVideosFromUser.map(obj => {
-      return {
-        createdAt: obj.createdAt || '',
-        directVideoUrl: obj.directVideoUrl || '',
-        playCount: obj.playCount || 0
-      };
-    });
-    //console.table(combinedArray);
+    const getAllVideosFromUser = await TikTokScraper.getAllVideosFromUser(username);
+    
     const startDate = new Date(firstDate);
     const endDate = new Date(secondDate);
 
-    function reverseDateFormat(dateString: string) {
-      const [day, month, year] = dateString.split('.');
-      return `${month}.${day}.${year}`;
-    }
-    const filteredArray = combinedArray.filter(obj => {
-      const createdAtDate = obj.createdAt; // Предполагается, что createdAt содержит дату в строковом формате "дд.мм.гггг"
-      const reversedCreatedAtDate = reverseDateFormat(createdAtDate); // Преобразуем формат
-      return new Date(reversedCreatedAtDate) >= new Date(startDate) && new Date(reversedCreatedAtDate) <= new Date(endDate);
+    const filteredVideos = getAllVideosFromUser.filter((obj) => {
+      const createdAtDate = obj.createdAt;
+      const reversedCreatedAtDate = reverseDateFormat(createdAtDate);
+      const date = new Date(reversedCreatedAtDate);
+      return date >= startDate && date <= endDate;
     });
-    console.table(filteredArray)
-    if (filteredArray.length == 0) { return '*За указаный период ничего не найдено*' }
-    const filterPlayCount = filteredArray.reduce((accumulator, obj) => accumulator + obj.playCount, 0);
 
-    return `*${filteredArray[0].directVideoUrl || ''} | ${filteredArray[0].createdAt || ''} | ${filteredArray[0].playCount || ''}\n${filteredArray[filteredArray.length - 1].directVideoUrl || ''} | ${filteredArray[filteredArray.length -1].createdAt || ''} | ${filteredArray[filteredArray.length -1].playCount || ''}\nВидео за этот период: ${filteredArray.length || ''}\nПросмотров за этот период: ${filterPlayCount || ''}*`
+    if (filteredVideos.length === 0) {
+      return '*За указанный период ничего не найдено*';
+    }
+
+    const filterPlayCount = filteredVideos.reduce((accumulator, obj) => accumulator + obj.playCount, 0);
+
+    return `*${filteredVideos[0].directVideoUrl || ''} | ${filteredVideos[0].createdAt || ''} | ${filteredVideos[0].playCount || ''}\n${filteredVideos[filteredVideos.length - 1].directVideoUrl || ''} | ${filteredVideos[filteredVideos.length - 1].createdAt || ''} | ${filteredVideos[filteredVideos.length - 1].playCount || ''}\nВидео за этот период: ${filteredVideos.length}\nПросмотров за этот период: ${filterPlayCount}*`;
   } catch (error) {
     if (error instanceof TypeError && error.message.includes("Cannot read properties of undefined (reading 'users')")) {
-      console.log(error)
+      console.log(error);
       return '*Пользователь не найден!*';
     } else if (error instanceof Error && error.message.includes("invalid json response body at")) {
       console.log(error);
-      return '*TikTok выдал временную блокировку попробуйте немного позже!*';
+      return '*TikTok выдал временную блокировку. Попробуйте немного позже!*';
     } else {
-      console.log(error)
+      console.log(error);
       return '*Произошла ошибка. Попробуйте позже!*';
     }
   }
+}
+
+function reverseDateFormat(dateString: string) {
+  const [day, month, year] = dateString.split('.');
+  return `${month}.${day}.${year}`;
 }
