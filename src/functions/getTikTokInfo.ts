@@ -29,7 +29,7 @@ export default async function getTikTokInfo(firstDate: string, secondDate: strin
       const reversedCreatedAtDate = reverseDateFormat(createdAtDate); // Преобразуем формат
       return new Date(reversedCreatedAtDate) >= new Date(startDate) && new Date(reversedCreatedAtDate) <= new Date(endDate);
     });
-    //console.table(filteredArray)
+    console.table(filteredArray)
     if (filteredArray.length == 0) { return '*За указаный период ничего не найдено*' }
     const filterPlayCount = filteredArray.reduce((accumulator, obj) => accumulator + obj.playCount, 0);
 
@@ -38,7 +38,7 @@ export default async function getTikTokInfo(firstDate: string, secondDate: strin
     if (error instanceof TypeError && error.message.includes("Cannot read properties of undefined (reading 'users')")) {
       console.log(error)
       return '*Пользователь не найден!*';
-    } else if (error instanceof Error && error.message.includes("Invalid response body")) {
+    } else if (error instanceof Error && error.message.includes("invalid json response body at")) {
       console.log(error);
       return '*TikTok выдал временную блокировку попробуйте немного позже!*';
     } else {
