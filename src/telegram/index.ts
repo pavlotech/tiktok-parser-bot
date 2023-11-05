@@ -1,24 +1,28 @@
 import { Scenes, session } from 'telegraf';
 import SceneGenerator from '../types/SceneGenerator';
-import { bot } from '../../index';
-import help from './commands/help';
+//import { bot } from '../../index';
+import get_stat from './commands/get_stat';
 import start from './commands/start';
+import help from './commands/help';
 
-export async function loadTelegram() {
-  try {
-    bot.start(start);
+export class Launch {
+  async Telegram (bot: any) {
+    try {
+      const scene = new SceneGenerator()
+      const stage = new Scenes.Stage<Scenes.SceneContext>([
+        scene.firstDate(),
+        scene.secondDate(),
+        scene.getName()
+      ], { ttl: 10 * 60 * 1000 });
+      bot.use(session());
+      bot.use(stage.middleware());
 
-    const scene = new SceneGenerator()
-    const firstDate = scene.firstDate(), secondDate = scene.secondDate(), getName = scene.getName();
+      bot.start(start);
+      bot.command('get_stat', get_stat);
+      bot.command('help', help)
+      bot.launch();
 
-    const stage = new Scenes.Stage<Scenes.SceneContext>([firstDate, secondDate, getName], { ttl: 10 * 60 * 1000 });
-    bot.use(session());
-    bot.use(stage.middleware());
-
-    bot.command('get_stat', (ctx) => { ctx.scene.enter("firstdate") });
-    bot.command('help', help)
-    bot.launch();
-
-    return console.log('Connecting to Telegram')
-  } catch (error) { console.log(error) }
+      return 'Launch bot'
+    } catch (error) { return error }
+  }
 }
