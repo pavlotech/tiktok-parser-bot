@@ -1,13 +1,13 @@
-import { Context, Scenes } from 'telegraf';
-import isValidDate from '../functions/isValidDate';
+import { Scenes } from 'telegraf';
 import getTikTokInfo from '../functions/getTikTokInfo';
+import isValidDate from '../functions/isValidDate';
 
 export default class Scene {
   dataArray: string[] = [];
   firstDate () {
     const firstDate = new Scenes.BaseScene<Scenes.SceneContext>('firstdate')
     firstDate.enter(async (ctx) => {
-      await ctx.reply('*Введите дату начала в формате ММ.ДД.ГГГГ*', { parse_mode: 'Markdown' })
+      await ctx.reply('*Введите дату начала в формате ДД.ММ.ГГГГ*', { parse_mode: 'Markdown' })
     })
     firstDate.on('text', async (ctx) => {
       const firstDateMessage = ctx.message.text
@@ -24,7 +24,7 @@ export default class Scene {
   secondDate () {
     const secondDate = new Scenes.BaseScene<Scenes.SceneContext>('seconddate')
     secondDate.enter(async (ctx) => {
-      await ctx.reply('*Введите дату конца в формате ММ.ДД.ГГГГ*', { parse_mode: 'Markdown' })
+      await ctx.reply('*Введите дату конца в формате ДД.ММ.ГГГГ*', { parse_mode: 'Markdown' })
     })
     secondDate.on('text', async (ctx) => {
       const secondDateMessage = ctx.message.text
@@ -48,8 +48,7 @@ export default class Scene {
       this.dataArray.push(name);
       const waitMessage = await ctx.reply('*Идет получение информации...*', { parse_mode: 'Markdown' })
       await ctx.telegram.editMessageText(ctx.message?.chat.id, waitMessage.message_id, '', `${await getTikTokInfo(this.dataArray[0], this.dataArray[1], this.dataArray[2])}`, { parse_mode: 'Markdown' });
-      ctx.scene.leave(); // Завершаем сцену
-      // Если пользователь отправит сообщение, отменяем таймаут
+      ctx.scene.leave();
       this.dataArray.length = 0;
     })
     return getName

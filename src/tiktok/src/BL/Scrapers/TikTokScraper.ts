@@ -280,11 +280,18 @@ export class TTScraper {
 
     for (const result of resultArray) {
       for (const video of result) {
+        const createTimeDate = new Date(Number(video.createTime) * 1000);
+        const formattedCreateTime = createTimeDate.toLocaleDateString('en-US', {
+          month: '2-digit',
+          day: '2-digit',
+          year: 'numeric',
+        });
+    
         videos.push(
           new Video(
             video.id,
             video.desc,
-            new Date(Number(video.createTime) * 1000).toLocaleDateString(),
+            formattedCreateTime,
             Number(video.video?.height),
             Number(video.video?.width),
             Number(video.video?.duration),
@@ -311,7 +318,7 @@ export class TTScraper {
           )
         );
       }
-    }
+    }    
 
     return videos;
   }
