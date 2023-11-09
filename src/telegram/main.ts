@@ -1,5 +1,4 @@
 import { Telegraf, Scenes, session } from 'telegraf';
-import { TTScraper } from "../tiktok/src/main";
 import Scene from '../types/Scene';
 import dotenv from 'dotenv'; dotenv.config()
 import getStat from './commands/getStat';
@@ -8,7 +7,6 @@ import help from './commands/help';
 
 export class Launch {
   bot: any = new Telegraf<Scenes.SceneContext>(process.env.TG_TOKEN || '', { handlerTimeout: 60 * 60 * 1000 });
-  //tiktokscraper: any = new TTScraper()
   async Telegram () {
     try {
       const scene = new Scene()
@@ -25,7 +23,7 @@ export class Launch {
       this.bot.command('help', help)
       this.bot.launch();
 
-      return 'Launch bot'
-    } catch (error) { return error }
+      console.log('[BOT] Started')
+    } catch (error) { console.log(`[ERROR] ${error}`)  }
   }
 }

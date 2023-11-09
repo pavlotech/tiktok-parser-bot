@@ -1,5 +1,6 @@
 export default async function getStat (ctx: any) {
   try {
     ctx.scene.enter("firstdate")
-  } catch (error) { console.log(error) }
+    console.log(`[GET_STAT] ${ctx.from.username}`)
+  } catch (error) { console.log(`[ERROR] ${error}`) }
 }

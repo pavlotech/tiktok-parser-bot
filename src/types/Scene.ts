@@ -47,6 +47,7 @@ export default class Scene {
       const name = ctx.message.text;
       this.dataArray.push(name);
       const waitMessage = await ctx.reply('*Идет получение информации...*', { parse_mode: 'Markdown' })
+      console.log(`[GET_STAT] ${this.dataArray}`)
       await ctx.telegram.editMessageText(ctx.message?.chat.id, waitMessage.message_id, '', `${await getTikTokInfo(this.dataArray[0], this.dataArray[1], this.dataArray[2])}`, { parse_mode: 'Markdown' });
       ctx.scene.leave();
       this.dataArray.length = 0;

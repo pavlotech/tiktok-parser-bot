@@ -15,6 +15,7 @@ export default async function getTikTokInfo(firstDate: string, secondDate: strin
         playCount: obj.playCount || 0
       };
     });
+    //console.table(combinedArray);
 
     const firstDateParts = firstDate.split(".");
     const secondDateParts = secondDate.split(".");
@@ -38,13 +39,13 @@ export default async function getTikTokInfo(firstDate: string, secondDate: strin
   } catch (error) {
     switch (true) {
       case error instanceof TypeError && error.message.includes("Cannot read properties of undefined (reading 'users')"):
-        console.log(error);
+        console.log(`[ERROR] ${error}`)
         return '*Пользователь не найден!*';
       case error instanceof Error && error.message.includes("invalid json response body at"):
-        console.log(error);
+        console.log(`[ERROR] ${error}`)
         return '*TikTok выдал временную блокировку. Попробуйте немного позже!*';
       default:
-        console.log(error);
+        console.log(`[ERROR] ${error}`)
         return '*Произошла ошибка. Попробуйте позже!*';
     }
   }

@@ -115,22 +115,25 @@ export class TTScraper {
 
   private async requestWithPuppeteer(url: string) {
     const browser = await puppeteer.launch({
-      headless: true,
+      headless: "new", // Используйте новый Headless режим
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
     });
-    const page = await browser.newPage();
-    const tiktokPage = await page.goto(url, { waitUntil: "domcontentloaded" });
-
-    if (tiktokPage == null) {
+  
+    try {
+      const page = await browser.newPage();
+      const tiktokPage = await page.goto(url, { waitUntil: "domcontentloaded" });
+  
+      if (tiktokPage == null) {
+        throw new Error("Could not load the desired Page!");
+      }
+  
+      const html = await tiktokPage.text();
+      return this.extractJSONObject(html);
+    } finally {
       await browser.close();
-      throw new Error("Could not load the desired Page!");
     }
-
-    const html = await tiktokPage.text();
-
-    await browser.close();
-    return this.extractJSONObject(html);
   }
+  
 
   /**
    * Replaces the window Object with a export string and writes the new JS file to work with the result as a JS Object
@@ -286,7 +289,6 @@ export class TTScraper {
           day: '2-digit',
           year: 'numeric',
         });
-    
         videos.push(
           new Video(
             video.id,
@@ -318,7 +320,7 @@ export class TTScraper {
           )
         );
       }
-    }    
+    }
 
     return videos;
   }
