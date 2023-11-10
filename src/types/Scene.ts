@@ -7,6 +7,7 @@ export default class Scene {
   firstDate () {
     const firstDate = new Scenes.BaseScene<Scenes.SceneContext>('firstdate')
     firstDate.enter(async (ctx) => {
+      this.dataArray.length = 0;
       await ctx.reply('*Введите дату начала в формате ДД.ММ.ГГГГ*', { parse_mode: 'Markdown' })
     })
     firstDate.on('text', async (ctx) => {
@@ -33,7 +34,9 @@ export default class Scene {
         await ctx.reply('*Дата указана неверно*', { parse_mode: 'Markdown' })
         ctx.scene.reenter()
       } else {
-        ctx.scene.enter('getname')
+        console.log(this.dataArray)
+        ctx.scene.leave()
+        await ctx.reply('*Используйте команду /get_stat*', { parse_mode: 'Markdown' })
       }
     })
     return secondDate
@@ -41,6 +44,10 @@ export default class Scene {
   getName () {
     const getName = new Scenes.BaseScene<Scenes.SceneContext>('getname')
     getName.enter(async (ctx) => {
+      if (this.dataArray.length == 0) {
+        await ctx.reply('*Сначала укажите даты! /set_data*', { parse_mode: 'Markdown' })
+        return ctx.scene.leave();
+      }
       await ctx.reply('*Введите имя пользователя или ссылку*', { parse_mode: 'Markdown' })
     })
     getName.on('text', async (ctx) => {
@@ -50,7 +57,7 @@ export default class Scene {
       console.log(`[GET_STAT] ${this.dataArray}`)
       await ctx.telegram.editMessageText(ctx.message?.chat.id, waitMessage.message_id, '', `${await getTikTokInfo(this.dataArray[0], this.dataArray[1], this.dataArray[2])}`, { parse_mode: 'Markdown' });
       ctx.scene.leave();
-      this.dataArray.length = 0;
+      this.dataArray.pop();
     })
     return getName
   }
