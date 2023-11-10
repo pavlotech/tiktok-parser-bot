@@ -1,6 +1,6 @@
 import { TTScraper } from "../tiktok/src/main";
 
-export default async function getTikTokInfo(firstDate: string, secondDate: string, nameOrUrl: string) {
+export default async function getTikTokInfo(firstDate: string, secondDate: string, nameOrUrl: string, attempt: number = 1) {
   try {
     const TikTokScraper = new TTScraper();
 
@@ -15,7 +15,6 @@ export default async function getTikTokInfo(firstDate: string, secondDate: strin
         playCount: obj.playCount || 0
       };
     });
-    //console.table(combinedArray);
 
     const firstDateParts = firstDate.split(".");
     const secondDateParts = secondDate.split(".");
@@ -27,27 +26,25 @@ export default async function getTikTokInfo(firstDate: string, secondDate: strin
       return new Date(createdAtDate) >= new Date(startDate) && new Date(createdAtDate) <= new Date(endDate);
     });
     const filterPlayCount = filteredArray.reduce((accumulator, obj) => accumulator + obj.playCount, 0);
-    console.table(filteredArray)
 
-    if (filteredArray.length == 0) return '*За указаный период ничего не найдено*'
+    //console.table(filteredArray);
+
+    if (filteredArray.length === 0) return '*За указанный период ничего не найдено*';
 
     const firstVideo = filteredArray[0];
     const lastVideo = filteredArray[filteredArray.length - 1];
     
     return `*${firstVideo.directVideoUrl || ''} | ${firstVideo.createdAt || ''} | ${firstVideo.playCount || ''}\n${lastVideo.directVideoUrl || ''} | ${lastVideo.createdAt || ''} | ${lastVideo.playCount || ''}\nВидео за этот период: ${filteredArray.length}\nПросмотров за этот период: ${filterPlayCount || ''}*`;
-
   } catch (error) {
     switch (true) {
       case error instanceof TypeError && error.message.includes("Cannot read properties of undefined (reading 'users')"):
-        console.log(`[ERROR] ${error}`)
+        console.error(`[ERROR] ${error}`)
         return '*Пользователь не найден!*';
-      case error instanceof Error && error.message.includes("invalid json response body at"):
-        console.log(`[ERROR] ${error}`)
-        return '*TikTok выдал временную блокировку. Попробуйте немного позже!*';
       default:
-        console.log(error)
-        console.log(`[ERROR] ${error}`)
-        return '*Произошла ошибка. Попробуйте позже!*';
+        console.error(`[ERROR] ${error}\nПовторный вызов через 30 секунд...`);
+        await new Promise(resolve => setTimeout(resolve, 30 * 1000));
+        // Повторный вызов функции
+        return getTikTokInfo(firstDate, secondDate, nameOrUrl, attempt + 1);
     }
   }
 }
