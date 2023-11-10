@@ -45,6 +45,7 @@ export default async function getTikTokInfo(firstDate: string, secondDate: strin
         console.log(`[ERROR] ${error}`)
         return '*TikTok выдал временную блокировку. Попробуйте немного позже!*';
       default:
+        console.log(error)
         console.log(`[ERROR] ${error}`)
         return '*Произошла ошибка. Попробуйте позже!*';
     }
