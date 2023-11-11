@@ -38,10 +38,10 @@ export default async function getTikTokInfo(firstDate: string, secondDate: strin
   } catch (error) {
     switch (true) {
       case error instanceof TypeError && error.message.includes("Cannot read properties of undefined (reading 'users')"):
-        console.error(`[ERROR] ${error}`)
+        console.error(`[ERROR]`, error)
         return '*Пользователь не найден!*';
       default:
-        console.error(`[ERROR] ${error}\nПовторный вызов через 30 секунд...`);
+        console.error(`[ERROR]`, error);
         await new Promise(resolve => setTimeout(resolve, 30 * 1000));
         // Повторный вызов функции
         return getTikTokInfo(firstDate, secondDate, nameOrUrl, attempt + 1);
