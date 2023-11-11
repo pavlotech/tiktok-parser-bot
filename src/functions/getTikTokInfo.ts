@@ -4,38 +4,55 @@ export default async function getTikTokInfo(firstDate: string, secondDate: strin
   try {
     const TikTokScraper = new TTScraper();
 
-    const match = nameOrUrl.match(/@(.+?)(\?|\/|$)/);
-    let username = match ? match[1] : nameOrUrl;
-
-    const getAllVideosFromUser = await TikTokScraper.getAllVideosFromUser(username);
-    const combinedArray = getAllVideosFromUser.map(obj => {
-      return {
-        createdAt: obj.createdAt || '',
-        directVideoUrl: obj.directVideoUrl || '',
-        playCount: obj.playCount || 0
-      };
+    // Разделите строку на массив имен пользователей
+    const usernames = nameOrUrl.split(/\s+/).map(username => {
+      // Извлекаем имя пользователя из ссылки
+      const match = username.match(/@(.+?)(\?|\/|$)/);
+      return match ? match[1] : username;
     });
 
-    const firstDateParts = firstDate.split(".");
-    const secondDateParts = secondDate.split(".");
-    const startDate = `${firstDateParts[1]}.${firstDateParts[0]}.${firstDateParts[2]}`;
-    const endDate = `${secondDateParts[1]}.${secondDateParts[0]}.${secondDateParts[2]}`;
+    // Создайте массив для хранения данных о пользователях
+    const userDataArray = [];
 
-    const filteredArray = combinedArray.filter(obj => {
-      const createdAtDate = obj.createdAt;
-      return new Date(createdAtDate) >= new Date(startDate) && new Date(createdAtDate) <= new Date(endDate);
-    });
-    const filterPlayCount = filteredArray.reduce((accumulator, obj) => accumulator + obj.playCount, 0);
+    // Обработайте каждого пользователя
+    for (const username of usernames) {
+      const getAllVideosFromUser = await TikTokScraper.getAllVideosFromUser(username);
+      const combinedArray = getAllVideosFromUser.map(obj => {
+        return {
+          createdAt: obj.createdAt || '',
+          directVideoUrl: obj.directVideoUrl || '',
+          playCount: obj.playCount || 0
+        };
+      });
 
-    //console.table(filteredArray);
+      // Добавьте данные о пользователе в массив
+      userDataArray.push({
+        username: username,
+        videos: combinedArray
+      });
+    }
 
-    if (filteredArray.length === 0) return '*За указанный период ничего не найдено*';
+    // Создайте массив для хранения результатов
+    const resultsArray = [];
 
-    const firstVideo = filteredArray[0];
-    const lastVideo = filteredArray[filteredArray.length - 1];
-    
-    return `*${firstVideo.directVideoUrl || ''} | ${firstVideo.createdAt || ''} | ${firstVideo.playCount || ''}\n${lastVideo.directVideoUrl || ''} | ${lastVideo.createdAt || ''} | ${lastVideo.playCount || ''}\nВидео за этот период: ${filteredArray.length}\nПросмотров за этот период: ${filterPlayCount || ''}*`;
+    // Обработайте каждого пользователя в массиве userDataArray
+    for (const userData of userDataArray) {
+      const combinedArray = userData.videos;
+      const firstVideo = combinedArray[0];
+      const lastVideo = combinedArray[combinedArray.length - 1];
+      const filterPlayCount = combinedArray.reduce((accumulator, obj) => accumulator + obj.playCount, 0);
+
+      // Формируйте строку для каждого пользователя
+      const userResultText = `*[${firstDate} - ${secondDate}] - ${userData.username}\n${firstVideo.directVideoUrl || ''} | ${firstVideo.createdAt || ''} | ${firstVideo.playCount || ''}\n${lastVideo.directVideoUrl || ''} | ${lastVideo.createdAt || ''} | ${lastVideo.playCount || ''}\nВидео за период: ${combinedArray.length}\nПросмотров за период: ${filterPlayCount || ''}\n*`;
+
+      // Добавьте строку в массив результатов
+      resultsArray.push(userResultText);
+    }
+
+    // Объедините все строки результатов символами новой строки и верните результат
+    return resultsArray.join('\n');
   } catch (error) {
+    // Обработка ошибок остается неизменной
     switch (true) {
       case error instanceof TypeError && error.message.includes("Cannot read properties of undefined (reading 'users')"):
         console.error(`[ERROR]`, error)
