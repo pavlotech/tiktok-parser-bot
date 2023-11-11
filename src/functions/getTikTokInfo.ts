@@ -52,7 +52,7 @@ export default async function getTikTokInfo(firstDate: string, secondDate: strin
         const userResultText = `*[${firstDate} - ${secondDate}] - ${userData.username}\n${firstVideo.directVideoUrl || ''} | ${firstVideo.createdAt || ''} | ${firstVideo.playCount || ''}\n${lastVideo.directVideoUrl || ''} | ${lastVideo.createdAt || ''} | ${lastVideo.playCount || ''}\nВидео за период: ${combinedArray.length}\nПросмотров за период: ${filterPlayCount || ''}\n*`;
 
         resultsArray.push(userResultText);
-      } else resultsArray.push(`*[${firstDate} - ${secondDate}] - ${userData.username}\nНет видео за период*`);
+      } else resultsArray.push(`*[${firstDate} - ${secondDate}] - ${userData.username}\nНет видео за период\n*`);
     }
 
     return resultsArray.join('\n');
