@@ -4,17 +4,13 @@ export default async function getTikTokInfo(firstDate: string, secondDate: strin
   try {
     const TikTokScraper = new TTScraper();
 
-    // Разделите строку на массив имен пользователей
     const usernames = nameOrUrl.split(/\s+/).map(username => {
       // Извлекаем имя пользователя из ссылки
       const match = username.match(/@(.+?)(\?|\/|$)/);
       return match ? match[1] : username;
     });
 
-    // Создайте массив для хранения данных о пользователях
     const userDataArray = [];
-
-    // Обработайте каждого пользователя
     for (const username of usernames) {
       const getAllVideosFromUser = await TikTokScraper.getAllVideosFromUser(username);
       const combinedArray = getAllVideosFromUser.map(obj => {
@@ -25,34 +21,42 @@ export default async function getTikTokInfo(firstDate: string, secondDate: strin
         };
       });
 
-      // Добавьте данные о пользователе в массив
+      // Фильтруем видео по датам
+      const firstDateParts = firstDate.split(".");
+      const secondDateParts = secondDate.split(".");
+      const startDate = `${firstDateParts[1]}.${firstDateParts[0]}.${firstDateParts[2]}`;
+      const endDate = `${secondDateParts[1]}.${secondDateParts[0]}.${secondDateParts[2]}`;
+  
+      const filteredArray = combinedArray.filter(obj => {
+        const createdAtDate = obj.createdAt;
+        return new Date(createdAtDate) >= new Date(startDate) && new Date(createdAtDate) <= new Date(endDate);
+      });
+      const filterPlayCount = filteredArray.reduce((accumulator, obj) => accumulator + obj.playCount, 0);
+
       userDataArray.push({
         username: username,
-        videos: combinedArray
+        videos: filteredArray,
+        playCount: filterPlayCount
       });
     }
 
-    // Создайте массив для хранения результатов
     const resultsArray = [];
-
-    // Обработайте каждого пользователя в массиве userDataArray
     for (const userData of userDataArray) {
       const combinedArray = userData.videos;
-      const firstVideo = combinedArray[0];
-      const lastVideo = combinedArray[combinedArray.length - 1];
-      const filterPlayCount = combinedArray.reduce((accumulator, obj) => accumulator + obj.playCount, 0);
 
-      // Формируйте строку для каждого пользователя
-      const userResultText = `*[${firstDate} - ${secondDate}] - ${userData.username}\n${firstVideo.directVideoUrl || ''} | ${firstVideo.createdAt || ''} | ${firstVideo.playCount || ''}\n${lastVideo.directVideoUrl || ''} | ${lastVideo.createdAt || ''} | ${lastVideo.playCount || ''}\nВидео за период: ${combinedArray.length}\nПросмотров за период: ${filterPlayCount || ''}\n*`;
+      if (combinedArray.length > 0) {
+        const firstVideo = combinedArray[0];
+        const lastVideo = combinedArray[combinedArray.length - 1];
+        const filterPlayCount = userData.playCount
 
-      // Добавьте строку в массив результатов
-      resultsArray.push(userResultText);
+        const userResultText = `*[${firstDate} - ${secondDate}] - ${userData.username}\n${firstVideo.directVideoUrl || ''} | ${firstVideo.createdAt || ''} | ${firstVideo.playCount || ''}\n${lastVideo.directVideoUrl || ''} | ${lastVideo.createdAt || ''} | ${lastVideo.playCount || ''}\nВидео за период: ${combinedArray.length}\nПросмотров за период: ${filterPlayCount || ''}\n*`;
+
+        resultsArray.push(userResultText);
+      } else resultsArray.push(`*Нет видео пользователя ${userData.username} за период*`);
     }
 
-    // Объедините все строки результатов символами новой строки и верните результат
     return resultsArray.join('\n');
   } catch (error) {
-    // Обработка ошибок остается неизменной
     switch (true) {
       case error instanceof TypeError && error.message.includes("Cannot read properties of undefined (reading 'users')"):
         console.error(`[ERROR]`, error)
@@ -61,7 +65,9 @@ export default async function getTikTokInfo(firstDate: string, secondDate: strin
         console.error(`[ERROR]`, error);
         await new Promise(resolve => setTimeout(resolve, 30 * 1000));
         // Повторный вызов функции
+        console.log(`[ERROR] restarting function`)
         return getTikTokInfo(firstDate, secondDate, nameOrUrl, attempt + 1);
     }
   }
 }
+
