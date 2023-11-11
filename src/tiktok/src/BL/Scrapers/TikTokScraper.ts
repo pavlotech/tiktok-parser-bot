@@ -103,9 +103,14 @@ export class TTScraper {
 
   private checkJSONExisting(content: string) {
     try {
-      return JSON.parse(content) ? true : false;
-    } catch (error) {}
-  }
+      const parsedJson = JSON.parse(content);
+      return parsedJson ? true : false;
+    } catch (error) {
+      console.error('[JSON]', error);
+      return false;
+    }
+  }  
+  
 
   /**
    * Does Tiktok Requests with headless chrome

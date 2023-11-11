@@ -3,16 +3,26 @@ import getTikTokInfo from '../functions/getTikTokInfo';
 import isValidDate from '../functions/isValidDate';
 
 export default class Scene {
-  dataArray: string[] = [];
+  dataArray: Map<number, string[]> = new Map<number, string[]>;
   firstDate () {
     const scene = new Scenes.BaseScene<Scenes.SceneContext>('first_date')
     scene.enter(async (ctx) => {
-      this.dataArray.length = 0;
       await ctx.reply('*Введите дату начала в формате ДД.ММ.ГГГГ*', { parse_mode: 'Markdown' })
     })
     scene.on('text', async (ctx) => {
       const firstDateMessage = ctx.message.text
-      this.dataArray.push(firstDateMessage);
+
+      let dates = this.dataArray.get(ctx.from?.id)
+      if (!dates) {
+        if (!ctx.from) { return }
+        this.dataArray.set(ctx.from.id, [])
+        dates = []
+      }
+      if (dates.length > 0) dates = []
+      dates.push(ctx.message.text)
+      if (!ctx.from) { return }
+      this.dataArray.set(ctx.from.id, dates)
+
       if (!isValidDate(firstDateMessage)) {
         await ctx.reply('*Дата указана неверно*', { parse_mode: 'Markdown' })
         ctx.scene.reenter()
@@ -29,7 +39,16 @@ export default class Scene {
     })
     scene.on('text', async (ctx) => {
       const secondDateMessage = ctx.message.text
-      this.dataArray.push(secondDateMessage);
+
+      let dates = this.dataArray.get(ctx.from?.id)
+      if (!dates) {
+        this.dataArray.set(ctx.from?.id, [])
+        dates = []
+      }
+      dates.push(ctx.message.text)
+      if (!ctx.from) return
+      this.dataArray.set(ctx.from.id, dates)
+
       if (!isValidDate(secondDateMessage)) {
         await ctx.reply('*Дата указана неверно*', { parse_mode: 'Markdown' })
         ctx.scene.reenter()
@@ -44,20 +63,30 @@ export default class Scene {
   getName () {
     const scene = new Scenes.BaseScene<Scenes.SceneContext>('get_name')
     scene.enter(async (ctx) => {
-      if (this.dataArray.length == 0) {
+      if (!ctx.from) return
+      const dates = this.dataArray.get(ctx.from.id)
+      if (!dates) {
         await ctx.reply('*Сначала укажите даты! /set_data*', { parse_mode: 'Markdown' })
         return ctx.scene.leave();
       }
       await ctx.reply('*Введите имя пользователя или ссылку*', { parse_mode: 'Markdown' })
     })
     scene.on('text', async (ctx) => {
+      if (!ctx.from) return
+      const dates = this.dataArray.get(ctx.from.id)
+
       const name = ctx.message.text;
-      this.dataArray.push(name);
+      if (!dates) {
+        await ctx.reply('*Сначала укажите даты! /set_data*', { parse_mode: 'Markdown' })
+        return ctx.scene.leave();
+      }
+      if (dates.length >= 3) { dates[2] = name } else { dates.push(name) }
       const waitMessage = await ctx.reply('*Подготовка информации, это может занять несколько минут...*', { parse_mode: 'Markdown' })
-      console.log(`[GET_STAT] ${this.dataArray}`)
-      await ctx.telegram.editMessageText(ctx.message?.chat.id, waitMessage.message_id, '', `${await getTikTokInfo(this.dataArray[0], this.dataArray[1], this.dataArray[2])}`, { parse_mode: 'Markdown' });
+
+      console.log(`[GET_STAT] ${dates}`)
+      await ctx.telegram.editMessageText(ctx.message?.chat.id, waitMessage.message_id, '', `${await getTikTokInfo(dates[0], dates[1], dates[2])}`, { parse_mode: 'Markdown' });
+      console.log(`[GET_STAT] ${ctx.from.username} completed`)
       ctx.scene.leave();
-      this.dataArray.pop();
     })
     return scene
   }
