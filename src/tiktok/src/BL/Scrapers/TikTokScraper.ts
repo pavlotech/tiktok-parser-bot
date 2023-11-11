@@ -103,8 +103,11 @@ export class TTScraper {
 
   private checkJSONExisting(content: string) {
     try {
-      return JSON.parse(content) ? true : false;
-    } catch (error) {}
+      return true
+      //return JSON.parse(content);
+    } catch (error) {
+      //return JSON.parse(content);
+    }
   }
 
   /**
