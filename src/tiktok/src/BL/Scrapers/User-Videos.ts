@@ -58,6 +58,7 @@ export async function getUserVideos(userUID: string, cursor: string): Promise<Us
   if (getVideos.status !== 200) {
     throw new Error("A request to get the user's videos was not successful!");
   }
+  //console.log(getVideos);
   return (await getVideos.json()) as UserVideosResponse;
 }
 

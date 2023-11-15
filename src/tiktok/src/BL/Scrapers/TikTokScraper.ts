@@ -103,11 +103,8 @@ export class TTScraper {
 
   private checkJSONExisting(content: string) {
     try {
-      return true
-      //return JSON.parse(content);
-    } catch (error) {
-      //return JSON.parse(content);
-    }
+      return JSON.parse(content) ? true : false;
+    } catch (error) {}
   }
 
   /**
@@ -285,6 +282,7 @@ export class TTScraper {
     }
 
     for (const result of resultArray) {
+      //console.log(result);
       for (const video of result) {
         const createTimeDate = new Date(Number(video.createTime) * 1000);
         const formattedCreateTime = createTimeDate.toLocaleDateString('en-US', {

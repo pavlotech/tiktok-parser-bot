@@ -1,6 +1,7 @@
 import { Scenes } from 'telegraf';
 import getTikTokInfo from '../functions/getTikTokInfo';
 import isValidDate from '../functions/isValidDate';
+import * as fs from 'fs';
 
 export default class Scene {
   dataArray: Map<number, string[]> = new Map<number, string[]>;
@@ -81,11 +82,19 @@ export default class Scene {
         return ctx.scene.leave();
       }
       if (dates.length >= 3) { dates[2] = name } else { dates.push(name) }
-      const waitMessage = await ctx.reply('*Подготовка информации, это может занять несколько минут...*', { parse_mode: 'Markdown' })
+      const waitMessage = await ctx.reply('*Подготовка информации, это может занять несколько минут...*', { parse_mode: 'Markdown' });
 
-      console.log(`[GET_STAT] ${dates}`)
-      await ctx.telegram.editMessageText(ctx.message?.chat.id, waitMessage.message_id, '', `${await getTikTokInfo(dates[0], dates[1], dates[2])}`, { parse_mode: 'Markdown' });
-      console.log(`[GET_STAT] ${ctx.from.username} completed`)
+      console.log(`[GET_STAT] ${dates}`);
+      const result = await getTikTokInfo(dates[0], dates[1], dates[2]);
+      
+      await ctx.telegram.editMessageText(ctx.message?.chat.id, waitMessage.message_id, '', '*Отправлен файл с данными*', { parse_mode: 'Markdown' });
+
+      // Отправка файла txt, если существует
+      if (result?.tableFilePath) {
+        await ctx.replyWithDocument({ source: result.tableFilePath });
+      }
+
+      console.log(`[GET_STAT] ${ctx.from.username} completed`);
       ctx.scene.leave();
     })
     return scene
