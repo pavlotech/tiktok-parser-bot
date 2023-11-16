@@ -11,7 +11,6 @@ export default async function получитьИнформациюТикТок(f
       return match ? match[1] : username;
     });
 
-    const resultsArray = [];
     const tableRows = [];
 
     for (const username of usernames) {
@@ -29,10 +28,12 @@ export default async function получитьИнформациюТикТок(f
         } catch (error) {
           if (error instanceof TypeError && error.message.includes("Cannot read properties of undefined (reading 'users')")) {
             console.error(`[ERROR]`, error);
-            resultsArray.push('*Пользователь не найден!*');
+            tableRows.push(`Пользователь - ${username} не найден!`);
             return;
           }
+          console.error(`[ERROR]`, error);
           await new Promise(resolve => setTimeout(resolve, 30 * 1000));
+          console.log(`[ERROR] ${username} restarting function`)
           return getUserVideos(this_attempt + 1);
         }
       }
@@ -63,10 +64,9 @@ export default async function получитьИнформациюТикТок(f
         // Добавляем строки таблицы для текущего пользователя в общий массив
         const userTable = [
           `[${firstDate} - ${secondDate}] - ${username}`,
-          'URL Видео | Дата Создания | Количество просмотров',
           ...videoRows,
-          `Видео за период: ${filteredArray.length}`,
-          `Просмотров за период: ${formattedPlayCount}`
+          `Видео за период - [${filteredArray.length}]`,
+          `Просмотров за период - [${formattedPlayCount}]`,
         ];
         tableRows.push(userTable.join('\n'));
       }
