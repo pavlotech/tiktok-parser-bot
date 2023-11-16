@@ -2,7 +2,7 @@ import { TTScraper } from "../tiktok/src/main";
 import * as fs from 'fs/promises';
 import * as path from 'path';
 
-export default async function получитьИнформациюТикТок(firstDate: string, secondDate: string, nameOrUrl: string, attempt: number = 1) {
+export default async function getTikTokInfo(firstDate: string, secondDate: string, nameOrUrl: string, attempt: number = 1) {
   try {
     const TikTokScraper = new TTScraper();
 

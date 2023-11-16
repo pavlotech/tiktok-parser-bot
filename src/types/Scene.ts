@@ -1,7 +1,6 @@
 import { Scenes } from 'telegraf';
 import getTikTokInfo from '../functions/getTikTokInfo';
 import isValidDate from '../functions/isValidDate';
-import * as fs from 'fs';
 
 export default class Scene {
   dataArray: Map<number, string[]> = new Map<number, string[]>;
