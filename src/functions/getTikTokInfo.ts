@@ -12,6 +12,7 @@ export default async function getTikTokInfo(firstDate: string, secondDate: strin
     });
 
     const tableRows = [];
+    let status = false;
 
     for (const username of usernames) {
       async function getUserVideos(this_attempt: number = 1) {
@@ -27,8 +28,9 @@ export default async function getTikTokInfo(firstDate: string, secondDate: strin
           return combinedArray;
         } catch (error) {
           if (error instanceof TypeError && error.message.includes("Cannot read properties of undefined (reading 'users')")) {
-            console.error(`[ERROR]`, error);
+            console.error(`[ERROR] ${error}`);
             tableRows.push(`Пользователь - ${username} не найден!`);
+            status = true;
             return;
           }
           console.error(`[ERROR]`, error);
@@ -77,6 +79,7 @@ export default async function getTikTokInfo(firstDate: string, secondDate: strin
     const filePathTable = path.join(__dirname, '../storage/txt', fileNameTable);
     await fs.writeFile(filePathTable, tableText, 'utf-8');
 
+    if (tableRows.length == 1 && status) return { user: tableRows[0] }
     return { tableFilePath: filePathTable };
   } catch (error) {
     console.error(`[ERROR]`, error);

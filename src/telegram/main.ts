@@ -26,6 +26,6 @@ export class Launch {
       this.bot.launch();
 
       console.log('[BOT] Started')
-    } catch (error) { console.error(`[ERROR]`, error);  }
+    } catch (error) { console.error(`[ERROR] ${error}`)  }
   }
 }
