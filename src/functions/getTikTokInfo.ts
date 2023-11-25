@@ -12,6 +12,7 @@ export default async function getTikTokInfo(firstDate: string, secondDate: strin
     });
 
     const tableRows = [];
+    const tableRows_2 = []
     let status = false;
 
     for (const username of usernames) {
@@ -74,10 +75,11 @@ export default async function getTikTokInfo(firstDate: string, secondDate: strin
         ];
         const userResultText = `*[${firstDate} - ${secondDate}] - ${username}\n${firstVideo}\n${lastVideo}\nВидео за период: ${filteredArray.length}\nПросмотров за период: ${formattedPlayCount}\n*`;
         tableRows.push(userResultText);
+        tableRows_2.push(userTable)
       }
     }
     // Записываем таблицу в текстовый файл
-    const tableText = tableRows.join('\n\n');
+    const tableText = tableRows_2.join('\n\n');
     const fileNameTable = `${new Date().toISOString().replace(/[:.]/g, '_')}.txt`;
     const filePathTable = path.join(__dirname, '../storage/txt', fileNameTable);
     await fs.writeFile(filePathTable, tableText, 'utf-8');
