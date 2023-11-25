@@ -88,12 +88,12 @@ export default class Scene {
       console.log(`[GET_STAT] ${dates}`);
       const result = await getTikTokInfo(dates[0], dates[1], dates[2]);
       
-      await ctx.telegram.editMessageText(ctx.message?.chat.id, waitMessage.message_id, '', `${result?.user || '*Отправлен файл с данными*'}`, { parse_mode: 'Markdown' });
+      await ctx.telegram.editMessageText(ctx.message?.chat.id, waitMessage.message_id, '', `${result}`, { parse_mode: 'Markdown' });
 
       // Отправка файла txt, если существует
-      if (result?.tableFilePath) {
+/*       if (result?.tableFilePath) {
         await ctx.replyWithDocument({ source: result.tableFilePath });
-      }
+      } */
       console.log(`[GET_STAT] ${ctx.from.username} completed`);
     })
     return scene

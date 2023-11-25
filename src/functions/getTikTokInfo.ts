@@ -73,14 +73,15 @@ export default async function getTikTokInfo(firstDate: string, secondDate: strin
         tableRows.push(userTable.join('\n'));
       }
     }
+    return tableRows
     // Записываем таблицу в текстовый файл
-    const tableText = tableRows.join('\n\n');
+/*     const tableText = tableRows.join('\n\n');
     const fileNameTable = `${new Date().toISOString().replace(/[:.]/g, '_')}.txt`;
     const filePathTable = path.join(__dirname, '../storage/txt', fileNameTable);
     await fs.writeFile(filePathTable, tableText, 'utf-8');
 
     if (tableRows.length == 1 && status) return { user: tableRows[0] }
-    return { tableFilePath: filePathTable };
+    return { tableFilePath: filePathTable }; */
   } catch (error) {
     console.error(`[ERROR]`, error);
   }
