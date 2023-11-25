@@ -64,24 +64,25 @@ export default async function getTikTokInfo(firstDate: string, secondDate: strin
         });
 
         // Добавляем строки таблицы для текущего пользователя в общий массив
+        const firstVideo = videoRows[0]
+        const lastVideo = videoRows[videoRows.length - 1]
         const userTable = [
           `[${firstDate} - ${secondDate}] - ${username}`,
           ...videoRows,
           `Видео за период - [${filteredArray.length}]`,
           `Просмотров за период - [${formattedPlayCount}]`,
         ];
-        tableRows.push(userTable.join('\n'));
+        const userResultText = `*[${firstDate} - ${secondDate}] - ${username}\n${firstVideo}\n${lastVideo}\nВидео за период: ${filteredArray.length}\nПросмотров за период: ${formattedPlayCount}\n*`;
+        tableRows.push(userResultText);
       }
     }
-    return tableRows
     // Записываем таблицу в текстовый файл
-/*     const tableText = tableRows.join('\n\n');
+    const tableText = tableRows.join('\n\n');
     const fileNameTable = `${new Date().toISOString().replace(/[:.]/g, '_')}.txt`;
     const filePathTable = path.join(__dirname, '../storage/txt', fileNameTable);
     await fs.writeFile(filePathTable, tableText, 'utf-8');
 
-    if (tableRows.length == 1 && status) return { user: tableRows[0] }
-    return { tableFilePath: filePathTable }; */
+    return { result: tableRows.join('\n'), tableFilePath: filePathTable };
   } catch (error) {
     console.error(`[ERROR]`, error);
   }

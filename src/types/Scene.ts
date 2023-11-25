@@ -1,4 +1,4 @@
-import { Scenes } from 'telegraf';
+import { Markup, Scenes } from 'telegraf';
 import getTikTokInfo from '../functions/getTikTokInfo';
 import isValidDate from '../functions/isValidDate';
 
@@ -61,6 +61,7 @@ export default class Scene {
     return scene
   }
   getName () {
+    const userFilePaths = new Map<number, string>();
     const scene = new Scenes.BaseScene<Scenes.SceneContext>('get_name')
     scene.enter(async (ctx) => {
       if (!ctx.from) return
@@ -87,15 +88,32 @@ export default class Scene {
       ctx.scene.leave();
       console.log(`[GET_STAT] ${dates}`);
       const result = await getTikTokInfo(dates[0], dates[1], dates[2]);
-      
-      await ctx.telegram.editMessageText(ctx.message?.chat.id, waitMessage.message_id, '', `${result}`, { parse_mode: 'Markdown' });
 
-      // Отправка файла txt, если существует
-/*       if (result?.tableFilePath) {
-        await ctx.replyWithDocument({ source: result.tableFilePath });
-      } */
+
+      await ctx.telegram.editMessageText(ctx.message?.chat.id, waitMessage.message_id, '', `${result?.result}`, {
+/*         reply_markup: {
+          inline_keyboard: [
+            [{ text: `Отправить TXT файл`, callback_data: 'get_file' }]
+          ]
+        }, */
+        parse_mode: 'Markdown'
+      });
+      if (result?.tableFilePath) {
+        //userFilePaths.set(ctx.from!.id, result?.tableFilePath);
+        await ctx.replyWithDocument({ source: result?.tableFilePath });
+      }
       console.log(`[GET_STAT] ${ctx.from.username} completed`);
     })
+
+    scene.hears('get_file', async (ctx) => {
+      const tableFilePath = userFilePaths.get(ctx.from!.id);
+      console.log(tableFilePath)
+  
+      if (tableFilePath) {
+        // Отправка файла пользователю
+        await ctx.replyWithDocument({ source: tableFilePath });
+      }
+    });
     return scene
   }
 }
